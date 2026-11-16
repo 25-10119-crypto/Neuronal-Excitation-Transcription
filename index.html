@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Neuronal Excitation–Transcription Coupling</title>
+<style>
+:root{--bg:#08111f;--panel:#101d30;--panel2:#14243a;--line:#263a55;--ink:#eaf2ff;--muted:#9eb1c9;--cyan:#59d8ed;--violet:#b59aff;--orange:#ffb86b;--green:#78dfa7;--red:#ff7e86}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 45% -15%,#183354 0,transparent 45%),var(--bg);color:var(--ink);font:14px/1.5 Inter,system-ui,-apple-system,"Segoe UI",sans-serif}
+.wrap{max-width:1440px;margin:auto;padding:22px}.top{display:flex;justify-content:space-between;gap:18px;align-items:flex-start;margin-bottom:18px}.eyebrow{color:var(--cyan);font-size:11px;letter-spacing:.16em;text-transform:uppercase;font-weight:800}.top h1{font-size:clamp(23px,3vw,34px);line-height:1.12;margin:6px 0 8px;letter-spacing:-.035em}.top p{margin:0;color:var(--muted);max-width:780px}.tag{border:1px solid #33516f;padding:7px 11px;border-radius:99px;color:#b8cbe1;white-space:nowrap;font-size:11px}
+.layout{display:grid;grid-template-columns:minmax(0,1.65fr) minmax(310px,.85fr);gap:16px}.panel{background:linear-gradient(160deg,rgba(20,36,58,.97),rgba(12,24,40,.97));border:1px solid var(--line);border-radius:16px;box-shadow:0 12px 34px #0003;overflow:hidden}.panelhead{padding:14px 17px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:12px}.panelhead h2,.panelhead h3{font-size:14px;margin:0}.sub{color:var(--muted);font-size:11px}.stage{padding:8px 12px 0;position:relative}.stage svg{width:100%;height:auto;display:block;max-height:570px}.svglabel{font:12px system-ui;fill:#dceaff}.svgsmall{font:10px system-ui;fill:#91a9c5}.neuron-body{fill:#153a58;stroke:#5bb9d0;stroke-width:2}.nucleus{fill:#242f67;stroke:#b59aff;stroke-width:2}.dendrite{fill:none;stroke:#4fa8c5;stroke-width:13;stroke-linecap:round;stroke-linejoin:round}.dendrite-thin{fill:none;stroke:#4fa8c5;stroke-width:7;stroke-linecap:round;stroke-linejoin:round}.axon{fill:none;stroke:#6aa5c8;stroke-width:10;stroke-linecap:round}.synapse{fill:#eaa66b;stroke:#ffd59a;stroke-width:1.5}.ion{fill:#67e4ff;filter:drop-shadow(0 0 5px #4fe3ff)}.signal{fill:none;stroke:#b79dff;stroke-width:3;stroke-dasharray:7 8;opacity:.2}.mrna{fill:#ffbd75;stroke:#ffe2b8;stroke-width:1}.spine{fill:#17445c;stroke:#59d8ed;stroke-width:2}.pulse{animation:pulse 1.4s ease-in-out infinite}.flow{animation:dash 1s linear infinite}.ionMove{animation:ionFall 1.6s linear infinite}.mrnaMove{animation:mrnaFlow 3s linear infinite}.nucleusGlow{filter:drop-shadow(0 0 13px #b59aff)}.activeNode{filter:drop-shadow(0 0 12px #58dced)}
+@keyframes pulse{0%,100%{opacity:.4}50%{opacity:1}}@keyframes dash{to{stroke-dashoffset:-30}}@keyframes ionFall{0%{transform:translateY(-8px);opacity:0}25%{opacity:1}100%{transform:translateY(32px);opacity:0}}@keyframes mrnaFlow{0%{transform:translate(0,0);opacity:0}20%{opacity:1}100%{transform:translate(70px,35px);opacity:0}}
+.legend{display:flex;gap:14px;flex-wrap:wrap;padding:0 17px 15px;color:var(--muted);font-size:11px}.dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px}.metrics{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;padding:0 14px 14px}.metric{background:#0b1728;border:1px solid #243953;border-radius:11px;padding:10px 11px;min-width:0}.metric .k{font-size:10px;color:var(--muted)}.metric .v{font-size:19px;font-weight:750;margin-top:3px;white-space:nowrap}.metric .u{font-size:10px;color:var(--muted);margin-left:3px;font-weight:500}
+.rightcol{display:flex;flex-direction:column;gap:16px}.controls{padding:14px 16px}.control{margin-bottom:15px}.control:last-child{margin-bottom:0}.controltop{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px}.control label{font-weight:650;font-size:12px}.value{color:var(--cyan);font-variant-numeric:tabular-nums;font-size:12px}.range{width:100%;accent-color:var(--cyan);cursor:pointer}.minmax{display:flex;justify-content:space-between;color:#758ba6;font-size:10px;margin-top:2px}.presets{display:flex;gap:7px;flex-wrap:wrap;padding:0 16px 14px}.btn{border:1px solid #36516e;background:#172a43;color:#dbeaff;padding:8px 11px;border-radius:9px;font-weight:650;font-size:11px;cursor:pointer}.btn:hover{border-color:var(--cyan);background:#1c3955}.btn.primary{background:#17617a;border-color:#3caeca;color:white}.btn:disabled{opacity:.45;cursor:default}.transport{padding:12px 16px;border-top:1px solid var(--line);display:flex;align-items:center;gap:8px}.time{margin-left:auto;color:var(--muted);font-variant-numeric:tabular-nums;font-size:12px}.note{padding:10px 14px;margin:0 14px 14px;border-left:3px solid var(--orange);background:#1b2430;color:#c9d6e5;border-radius:5px;font-size:11px}
+.graphpanel{margin-top:16px}.graphgrid{display:grid;grid-template-columns:1fr 1fr;gap:0}.graphbox{padding:12px 15px;border-right:1px solid var(--line);border-bottom:1px solid var(--line)}.graphbox:nth-child(2n){border-right:0}.graphbox:nth-last-child(-n+2){border-bottom:0}.graphbox h3{font-size:12px;margin:0 0 6px;color:#d8e7f9}.graphbox canvas{width:100%;height:155px;display:block}.graphfoot{font-size:10px;color:var(--muted);margin-top:4px}
+.bottom{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px}.textpanel{padding:16px}.textpanel h3{margin:0 0 8px;font-size:13px}.textpanel p{margin:0 0 8px;color:#bccbe0;font-size:12px}.pathline{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;align-items:center;gap:7px;margin:10px 0}.pathbox{background:#0b1728;border:1px solid #2b405a;padding:9px;border-radius:9px;text-align:center;font-size:11px}.pathbox b{display:block;color:#eff6ff;margin-bottom:2px}.arrow{color:#7891ae}.source{padding:15px 17px;margin-top:16px}.source h3{font-size:12px;margin:0 0 9px}.source ol{margin:0;padding-left:18px;color:#aebfd3;font-size:11px}.source li{margin:6px 0}.source a{color:#7eddf0;text-decoration:none}.source a:hover{text-decoration:underline}.caveat{color:#f4c98f!important}.foot{color:#7187a2;font-size:10px;text-align:center;padding:15px 0 3px}
+@media(max-width:940px){.layout{grid-template-columns:1fr}.rightcol{display:grid;grid-template-columns:1fr 1fr}.rightcol .controlsPanel{grid-row:span 2}}
+@media(max-width:650px){.wrap{padding:12px}.top{display:block}.tag{display:inline-block;margin-top:12px}.rightcol,.bottom{display:flex;flex-direction:column}.metrics{grid-template-columns:repeat(2,1fr)}.graphgrid{grid-template-columns:1fr}.graphbox{border-right:0!important}.graphbox:nth-last-child(2){border-bottom:1px solid var(--line)}.pathline{grid-template-columns:1fr}.arrow{transform:rotate(90deg);text-align:center}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div><div class="eyebrow">Interactive neuroscience model · E–T coupling</div><h1>Neuronal Excitation–Transcription Coupling</h1><p>전기적 활동 패턴 → Ca²⁺ 신호 → CaMKIV·ERK/MAPK → CREB 인산화 → 유전자 전사 → 시냅스 변화</p></div>
+    <div class="tag">교육용 동역학 모델 · 30 min window</div>
+  </header>
+
+  <main class="layout">
+    <section class="panel">
+      <div class="panelhead"><div><h2>신경세포 국소 구조와 신호 흐름</h2><div class="sub">시냅스 · 수상돌기 · 세포체 · 핵 · 축삭 말단</div></div><div class="sub" id="stateLabel">대기 중</div></div>
+      <div class="stage">
+        <svg viewBox="0 0 900 530" role="img" aria-label="신경세포의 시냅스에서 핵까지 이어지는 흥분-전사 연결 과정">
+          <defs>
+            <radialGradient id="somaGrad"><stop offset="0" stop-color="#235579"/><stop offset="1" stop-color="#102d49"/></radialGradient>
+            <linearGradient id="axonGrad"><stop offset="0" stop-color="#4c9abd"/><stop offset="1" stop-color="#345879"/></linearGradient>
+            <marker id="arrowV" markerWidth="8" markerHeight="8" refX="5" refY="3" orient="auto"><path d="M0 0 L6 3 L0 6" fill="none" stroke="#b59aff" stroke-width="1.2"/></marker>
+          </defs>
+          <!-- Presynaptic terminal and cleft -->
+          <path d="M115 65 C145 40 205 43 229 71 C248 94 236 143 204 154 C171 164 120 148 108 119 C99 99 101 79 115 65Z" fill="#46314a" stroke="#d49c78" stroke-width="2"/>
+          <text x="104" y="35" class="svglabel">Presynaptic terminal</text>
+          <g fill="#ffcb86"><circle cx="145" cy="94" r="5"/><circle cx="171" cy="78" r="5"/><circle cx="199" cy="105" r="5"/><circle cx="160" cy="127" r="5"/><circle cx="211" cy="132" r="4"/></g>
+          <path d="M110 172 Q180 160 248 172" stroke="#9c6b6b" stroke-width="2" stroke-dasharray="3 5" fill="none"/>
+          <text x="119" y="193" class="svgsmall">Synaptic cleft · glutamate</text>
+          <!-- postsynaptic dendritic spine -->
+          <path class="dendrite" d="M255 177 C320 185 335 223 379 245 C413 264 431 278 458 291"/>
+          <path class="dendrite-thin" d="M335 225 C348 194 355 162 378 145 C399 129 421 130 443 139"/>
+          <path class="dendrite-thin" d="M370 243 C382 208 402 189 426 181"/>
+          <path class="dendrite-thin" d="M410 266 C429 233 458 224 478 227"/>
+          <path class="dendrite-thin" d="M300 209 C290 245 277 268 259 281"/>
+          <path class="dendrite-thin" d="M260 281 C241 298 232 313 224 329"/>
+          <path class="dendrite-thin" d="M441 291 C470 274 491 267 515 267"/>
+          <path class="dendrite-thin" d="M470 230 C484 196 504 178 524 171"/>
+          <text x="277" y="302" class="svglabel">Dendrite</text>
+          <path d="M250 171 C237 155 222 151 209 153" fill="none" stroke="#ffbc83" stroke-width="3"/>
+          <path d="M237 157 C225 143 215 137 202 137" stroke="#ffbc83" stroke-width="2" fill="none"/>
+          <g id="receptorGlow"><rect x="226" y="154" width="14" height="33" rx="5" fill="#ffbb76" stroke="#fff0d2"/><rect x="245" y="158" width="14" height="33" rx="5" fill="#73d9e9" stroke="#d7fbff"/></g>
+          <text x="192" y="220" class="svgsmall">AMPA / NMDA</text>
+          <g id="calciumDots"><circle class="ion ionMove" cx="238" cy="205" r="4"/><circle class="ion ionMove" cx="251" cy="205" r="4" style="animation-delay:.4s"/><circle class="ion ionMove" cx="264" cy="205" r="4" style="animation-delay:.8s"/></g>
+          <g id="spineHead"><path class="spine" d="M250 180 C239 167 236 150 244 138 C252 124 273 126 281 139 C291 154 279 177 265 184Z"/><text x="249" y="119" class="svgsmall">Dendritic spine</text></g>
+          <!-- Soma -->
+          <path id="soma" class="neuron-body" fill="url(#somaGrad)" d="M435 235 C474 198 544 196 591 220 C638 244 657 297 641 348 C629 392 580 423 523 413 C472 405 431 370 418 323 C409 289 414 257 435 235Z"/>
+          <text x="520" y="445" class="svglabel">Cell body (soma)</text>
+          <circle id="nucleus" class="nucleus" cx="532" cy="310" r="70"/>
+          <text x="506" y="390" class="svgsmall">Nucleus</text>
+          <!-- DNA and CREB -->
+          <g id="dna" transform="translate(494 270)"><path d="M0 0 C47 15 0 47 47 63 M47 0 C0 15 47 47 0 63" stroke="#c0a5ff" stroke-width="3" fill="none"/><path d="M7 7 L39 7 M6 20 L40 20 M6 34 L40 34 M6 48 L40 48 M7 60 L39 60" stroke="#8a9bdb" stroke-width="1.5"/></g>
+          <g id="crebBadge"><rect x="506" y="290" width="55" height="22" rx="8" fill="#7757aa" stroke="#d7c6ff"/><text x="513" y="305" font-size="10" fill="white">pCREB</text></g>
+          <text x="502" y="255" class="svgsmall">CRE site</text>
+          <path id="transcriptionArrow" class="signal flow" d="M565 312 C592 299 604 291 620 274" marker-end="url(#arrowV)"/>
+          <g id="mrnaGroup"><path class="mrna mrnaMove" d="M605 255 q7 -9 14 0 t14 0 t14 0" stroke-width="2" fill="none"/><path class="mrna mrnaMove" d="M605 276 q7 -9 14 0 t14 0 t14 0" stroke-width="2" fill="none" style="animation-delay:1s"/></g>
+          <text x="625" y="248" class="svgsmall">mRNA</text>
+          <!-- Axon and synapse target -->
+          <path class="axon" d="M622 338 C684 349 709 325 746 326 C787 327 803 351 841 341"/>
+          <path d="M841 341 C859 332 865 311 875 301 M841 341 C860 347 868 364 876 380" stroke="#6aa5c8" stroke-width="7" stroke-linecap="round" fill="none"/>
+          <g fill="#6aa5c8"><circle cx="879" cy="297" r="7"/><circle cx="879" cy="383" r="7"/></g>
+          <text x="712" y="390" class="svglabel">Axon</text>
+          <!-- Signal path overlays -->
+          <path id="path1" class="signal" d="M274 173 C332 192 370 247 432 273"/>
+          <path id="path2" class="signal" d="M432 273 C461 283 468 304 484 310"/>
+          <path id="path3" class="signal" d="M568 313 C598 326 616 339 647 342"/>
+          <g id="kinaseLabels"><rect x="356" y="329" width="88" height="27" rx="8" fill="#203654" stroke="#4e6a91"/><text x="366" y="347" font-size="10" fill="#b9d9ff">CaMKIV</text><rect x="356" y="362" width="88" height="27" rx="8" fill="#203654" stroke="#4e6a91"/><text x="365" y="380" font-size="10" fill="#b9d9ff">ERK / MAPK</text></g>
+          <g id="pathwayPulses"><circle cx="400" cy="342" r="6" fill="#b59aff" class="pulse"/><circle cx="400" cy="375" r="6" fill="#ffb86b" class="pulse" style="animation-delay:.5s"/></g>
+          <text x="20" y="488" class="svgsmall">Illustrative cell schematic · not to scale</text>
+        </svg>
+      </div>
+      <div class="legend"><span><i class="dot" style="background:var(--cyan)"></i>Ca²⁺ influx</span><span><i class="dot" style="background:var(--violet)"></i>CaMKIV → CREB</span><span><i class="dot" style="background:var(--orange)"></i>ERK/MAPK → CREB</span><span><i class="dot" style="background:var(--green)"></i>Gene transcription / mRNA</span></div>
+      <div class="metrics">
+        <div class="metric"><div class="k">Ca²⁺ peak</div><div class="v" id="mCa">0.485<span class="u">μM</span></div></div>
+        <div class="metric"><div class="k">AP width factor</div><div class="v" id="mAP">1.00<span class="u">×</span></div></div>
+        <div class="metric"><div class="k">CaMKIV branch</div><div class="v" id="mCamk">0<span class="u">%</span></div></div>
+        <div class="metric"><div class="k">ERK/MAPK branch</div><div class="v" id="mErk">0<span class="u">%</span></div></div>
+        <div class="metric"><div class="k">pCREB · model</div><div class="v" id="mCreb">0<span class="u">%</span></div></div>
+      </div>
+    </section>
+
+    <aside class="rightcol">
+      <section class="panel controlsPanel">
+        <div class="panelhead"><div><h2>실험 조건 조절</h2><div class="sub">슬라이더를 움직여 신호 패턴을 비교</div></div></div>
+        <div class="controls">
+          <div class="control"><div class="controltop"><label for="caPeak">세포체 Ca²⁺ 최고 농도</label><span class="value" id="caPeakVal">0.485 μM</span></div><input class="range" id="caPeak" type="range" min="0.25" max="0.95" step="0.005" value="0.485"><div class="minmax"><span>0.25 μM</span><span>0.95 μM</span></div></div>
+          <div class="control"><div class="controltop"><label for="duration">활동전위 burst 길이 (10 Hz)</label><span class="value" id="durationVal">1.8 s</span></div><input class="range" id="duration" type="range" min="1.8" max="9" step="0.1" value="1.8"><div class="minmax"><span>1.8 s</span><span>9.0 s</span></div></div>
+          <div class="control"><div class="controltop"><label for="kvFunction">전압개폐성 K⁺ 통로 기능</label><span class="value" id="kvVal">100%</span></div><input class="range" id="kvFunction" type="range" min="50" max="150" step="5" value="100"><div class="minmax"><span>50% · 재분극 약화</span><span>150% · 재분극 강화</span></div></div>
+          <div class="control"><div class="controltop"><label for="interval">Burst 사이 간격</label><span class="value" id="intervalVal">1.0 min</span></div><input class="range" id="interval" type="range" min="1" max="5" step="0.1" value="1"><div class="minmax"><span>1 min</span><span>5 min</span></div></div>
+          <div class="control"><div class="controltop"><label for="camkStrength">CaMKIV 경로 기여도</label><span class="value" id="camkVal">100%</span></div><input class="range" id="camkStrength" type="range" min="0" max="150" step="5" value="100"><div class="minmax"><span>0%</span><span>150%</span></div></div>
+          <div class="control"><div class="controltop"><label for="erkStrength">ERK/MAPK 경로 기여도</label><span class="value" id="erkVal">100%</span></div><input class="range" id="erkStrength" type="range" min="0" max="150" step="5" value="100"><div class="minmax"><span>0%</span><span>150%</span></div></div>
+          <div class="control"><div class="controltop"><label for="crebHalf">CREB 활성 감쇠 반감기</label><span class="value" id="crebHalfVal">9.6 min</span></div><input class="range" id="crebHalf" type="range" min="2" max="20" step="0.2" value="9.6"><div class="minmax"><span>2 min</span><span>20 min</span></div></div>
+        </div>
+        <div class="presets"><button class="btn primary" id="presetFast">짧고 잦은 burst</button><button class="btn" id="presetSlow">길고 드문 burst</button><button class="btn" id="reset">초기화</button></div>
+        <div class="note">K⁺ 통로는 활동전위의 재분극과 폭을 조절합니다. 이 모델은 K⁺ 통로 기능 변화를 AP 폭 및 Ca²⁺ 유입의 단순화된 계수로 반영합니다. 아래 두 기준 조건은 원 논문에서 30분간 총 540회 활동전위를 발생시킨 비교 조건입니다.</div>
+        <div class="transport"><button class="btn primary" id="play">▶ 시뮬레이션 실행</button><button class="btn" id="pause" disabled>Ⅱ 일시정지</button><button class="btn" id="restart">↺ 처음부터</button><span class="time" id="clock">t = 0.0 / 30 min</span></div>
+      </section>
+      <section class="panel">
+        <div class="panelhead"><div><h2>연쇄 변화 요약</h2><div class="sub">현재 입력값으로 계산한 모델 출력</div></div></div>
+        <div class="controls" style="padding-top:12px">
+          <div style="display:flex;justify-content:space-between;margin:0 0 5px;font-size:11px"><span>c-FOS 전사 지수</span><b id="fosNumber" style="color:var(--green)">0 / 100</b></div><div style="height:8px;background:#26364b;border-radius:99px;overflow:hidden"><div id="fosBar" style="height:100%;width:0;background:linear-gradient(90deg,#58c8e3,#83e1aa);border-radius:99px"></div></div>
+          <p id="interpret" style="font-size:11px;color:#b8c9dc;margin:12px 0 0">조건을 설정하고 시뮬레이션을 실행하세요.</p>
+          <div style="margin-top:13px;padding-top:10px;border-top:1px solid #263a55;font-size:11px;color:#9eb1c9"><b style="color:#e1ebf8">생물학적 해석</b><div id="readout" style="margin-top:5px">CaMKIV는 초기 pCREB 형성에, ERK/MAPK는 수 분에 걸친 지연성 신호와 후속 전사 조절에 기여합니다.</div></div>
+        </div>
+      </section>
+    </aside>
+  </main>
+
+  <section class="panel graphpanel">
+    <div class="panelhead"><div><h2>30분 시간축 · 신호의 시간적 통합</h2><div class="sub">실선은 모델 계산값이며, 세포 내 실제 농도 예측값으로 해석하면 안 됩니다.</div></div><div class="sub">현재 시각 커서가 재생에 따라 이동</div></div>
+    <div class="graphgrid">
+      <div class="graphbox"><h3>세포체 Ca²⁺ 농도 (μM)</h3><canvas id="caChart" width="700" height="190"></canvas><div class="graphfoot">기준 농도 0.08 μM · 자극 후 칼슘 회복은 초 단위</div></div>
+      <div class="graphbox"><h3>CREB 경로별 활성 (정규화)</h3><canvas id="pathChart" width="700" height="190"></canvas><div class="graphfoot"><span style="color:var(--violet)">CaMKIV</span> · <span style="color:var(--orange)">ERK/MAPK 지연성 기여</span> · <span style="color:#e8edff">합산 pCREB</span></div></div>
+    </div>
+  </section>
+
+  <section class="bottom">
+    <section class="panel textpanel">
+      <h3>두 CREB 활성화 경로의 시간적 차이</h3>
+      <div class="pathline"><div class="pathbox"><b>Ca²⁺ / CaM</b>칼슘 감지</div><div class="arrow">→</div><div class="pathbox"><b>CaMKK–CaMKIV</b>빠른 핵 신호</div><div class="arrow">→</div><div class="pathbox"><b>CREB Ser133</b>초기 인산화</div></div>
+      <div class="pathline"><div class="pathbox"><b>Ca²⁺ / CaMKII</b>시냅스 신호</div><div class="arrow">→</div><div class="pathbox"><b>Ras–Raf–MEK–ERK</b>느린 연쇄 반응</div><div class="arrow">→</div><div class="pathbox"><b>CREB / 전사조절</b>후기 신호 유지</div></div>
+      <p>두 경로는 CREB에서 수렴하지만 활성화 속도가 다릅니다. 이 모델은 빠른 CaMKIV 경로와 지연되는 ERK/MAPK 경로의 기여를 별도로 표시합니다.</p>
+    </section>
+    <section class="panel textpanel">
+      <h3>해석할 때 반드시 구분할 점</h3>
+      <p><b>측정값:</b> 논문에서 직접 보고한 칼슘 농도, 자극 빈도, 간격, 신호 반감기 등.</p>
+      <p><b>모델값:</b> 복잡한 생물학적 과정을 시각화하기 위해 정규화한 CaMKIV·ERK·pCREB·c-FOS 지수.</p>
+      <p class="caveat">따라서 c-FOS 지수 70이 실제 mRNA 70% 또는 70배를 뜻하지 않습니다. 이 값은 조절 변수를 바꿨을 때 결과가 어떻게 달라지는지 비교하기 위한 교육용 상대 지수입니다.</p>
+    </section>
+  </section>
+
+  <section class="panel source">
+    <h3>수치 근거 및 참고 문헌</h3>
+    <ol>
+      <li>Fields et al. (1997), <i>Action Potential-Dependent Regulation of Gene Expression</i>, <i>Journal of Neuroscience</i>. DRG 신경세포의 안정 시 Ca²⁺(약 50–100 nM), 10 Hz burst 조건, 칼슘 회복 시간상수(약 1.7–3.6 s), Ca²⁺ peak 0.485 및 0.735 μM, 자극 간격에 따른 c-FOS 차이를 보고. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC6573446/" target="_blank" rel="noreferrer">원문</a></li>
+      <li>Chawla et al. (2001), <i>CREB/CBP and SRE-interacting transcriptional regulators are fast on–off switches</i>. CaMK 경로의 빠른 CREB Ser133 인산화(칼슘 유입 후 30초 이내), MAPK 경로의 수 분 단위 반응 및 짧은 칼슘 신호(30–60초)에 대한 반응을 보고. <a href="https://onlinelibrary.wiley.com/doi/10.1046/j.1471-4159.2001.00645.x" target="_blank" rel="noreferrer">논문 페이지</a></li>
+      <li>Ma et al. (2023), <i>Excitation–transcription coupling, neuronal gene expression and synaptic plasticity</i>, <i>Nature Reviews Neuroscience</i>. CaMK·MAPK 경로가 CREB에서 수렴하며, 일부 L형 칼슘통로 매개 조건에서 MAPK가 자극 후 30분 시점의 CREB 인산화 유지에 기여함을 정리. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC12024187/" target="_blank" rel="noreferrer">리뷰 원문</a></li>
+      <li>Voltage-gated K⁺ channel review. Kv channels shape action-potential repolarization, duration and firing patterns; the K⁺ slider in this page is a simplified teaching proxy, not a calibrated experimental transfer function. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC4954569/" target="_blank" rel="noreferrer">리뷰 원문</a></li>
+      <li>In vivo CREB imaging study (2020). NMDA 2분 자극 후 CREB 센서 반응의 반시간(half-time) 약 2.1분, 350 pulses at 10 Hz 후 센서 반응 감쇠 반감기 약 9.6분을 보고. 이 값은 본 시뮬레이터의 초기 CREB 감쇠 설정을 안내하는 대표값이며, 보편적인 생물학적 상수는 아님. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC7144870/" target="_blank" rel="noreferrer">원문</a></li>
+    </ol>
+  </section>
+  <div class="foot">교육용 개념 시뮬레이션 · 모든 세포 그림은 모식도이며 실제 구조 비율과 분자 수를 나타내지 않습니다.</div>
+</div>
+<script>
+(() => {
+ const $ = id => document.getElementById(id);
+ const cfg = {base:0.08, maxTime:30, hz:10, calciumTauSec:2.5, camkHalf:5, erkHalf:1, mapkDelay:2.5};
+ let data=[], simTime=0, running=false, raf=null, lastFrame=0, lastUpdate=0;
+ const controls=['caPeak','duration','kvFunction','interval','camkStrength','erkStrength','crebHalf'];
+ const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+ const params=()=>({caPeak:+$('caPeak').value,duration:+$('duration').value,kv:+$('kvFunction').value/100,interval:+$('interval').value,camk:+$('camkStrength').value/100,erk:+$('erkStrength').value/100,crebHalf:+$('crebHalf').value});
+ const fmt=(v,n=2)=>Number(v).toFixed(n);
+ function setValues(){let p=params();$('caPeakVal').textContent=fmt(p.caPeak,3)+' μM';$('durationVal').textContent=fmt(p.duration,1)+' s';$('kvVal').textContent=Math.round(p.kv*100)+'%';$('intervalVal').textContent=fmt(p.interval,1)+' min';$('camkVal').textContent=Math.round(p.camk*100)+'%';$('erkVal').textContent=Math.round(p.erk*100)+'%';$('crebHalfVal').textContent=fmt(p.crebHalf,1)+' min';$('mCa').innerHTML=fmt(p.caPeak,3)+'<span class="u">μM</span>';}
+ function simulate(){
+   const p=params(), dt=.05, n=Math.round(cfg.maxTime/dt), tauCa=cfg.calciumTauSec/60;
+   // Conceptual proxy: weaker Kv-mediated repolarization broadens APs, allowing more Ca-channel activation.
+   const apWidthFactor=clamp(2-p.kv,.5,1.5), effectivePeak=cfg.base+(p.caPeak-cfg.base)*apWidthFactor;
+   const events=[]; for(let t=0;t<cfg.maxTime;t+=p.interval) events.push(t);
+   let camk=0,erk=0,late=0,integralFos=0,integralBdnf=0; data=[];
+   for(let i=0;i<=n;i++){
+     const t=i*dt; let ca=cfg.base;
+     for(const e of events){const age=t-e;if(age>=0 && age<.5) ca+=(effectivePeak-cfg.base)*Math.exp(-age/tauCa);}
+     // CaMK branch: rapid activation, with pCREB dephosphorylation represented by a 5-min half-life.
+     const burst=events.some(e=>Math.abs(t-e)<dt*.55);
+     if(burst){const drive=clamp((effectivePeak-cfg.base)/.5,0,1.6)*p.camk;camk=clamp(camk+0.42*drive,0,1.5);}
+     camk*=Math.exp(-Math.LN2*dt/cfg.camkHalf);
+     // ERK integrates repeated bursts only when the inter-burst spacing is short enough.
+     const intervalGate=clamp((5-p.interval)/4,0,1);
+     if(burst){const drive=clamp((effectivePeak-.30)/.45,0,1.5)*p.erk*intervalGate;erk=clamp(erk+0.62*drive,0,1.5);}
+     erk*=Math.exp(-Math.LN2*dt/cfg.erkHalf);
+     // Delayed ERK contribution to the CREB pool; the CREB half-life is user-adjustable.
+     const target=clamp(erk*.75,0,1);
+     late += (target-late)*(1-Math.exp(-dt/Math.max(.2,cfg.mapkDelay)));
+     late*=Math.exp(-Math.LN2*dt/p.crebHalf);
+     const fastP=clamp(camk,0,1), slowP=clamp(late,0,1);
+     const pcreb=1-(1-fastP)*(1-slowP);
+     const fosRate=clamp(pcreb*(.12+.88*clamp(erk,0,1)),0,1);
+     integralFos+=fosRate*dt; integralBdnf+=pcreb*dt;
+     data.push({t,ca,camk:fastP,erk:clamp(erk,0,1),late:slowP,pcreb,fosRate});
+   }
+   const fosIndex=100*(1-Math.exp(-integralFos/7.2));
+   const bdnfIndex=100*(1-Math.exp(-integralBdnf/19));
+   const final=data[data.length-1];
+   const totalAP=Math.floor(cfg.maxTime/p.interval)*p.duration*cfg.hz;
+   const peak=data.reduce((m,x)=>Math.max(m,x.ca),cfg.base);
+   $('mCa').innerHTML=fmt(peak,3)+'<span class="u">μM</span>';$('mAP').innerHTML=fmt(apWidthFactor,2)+'<span class="u">×</span>';
+   $('mCamk').innerHTML=Math.round(final.camk*100)+'<span class="u">%</span>';
+   $('mErk').innerHTML=Math.round(final.erk*100)+'<span class="u">%</span>';
+   $('mCreb').innerHTML=Math.round(final.pcreb*100)+'<span class="u">%</span>';
+   $('fosNumber').textContent=Math.round(fosIndex)+' / 100';$('fosBar').style.width=fosIndex+'%';
+   let desc='';
+   if(p.interval>=4.5) desc='간격이 약 5분에 가까워 ERK/MAPK 신호가 burst 사이에 충분히 누적되지 않는 조건입니다. pCREB가 남아 있어도 c-FOS 전사 지수는 낮아질 수 있습니다.';
+   else if(p.interval<=1.5) desc='짧은 간격으로 반복되는 자극이 CaMK 및 ERK/MAPK 신호를 시간적으로 통합합니다. 두 경로가 함께 활성화되면 c-FOS 전사 조절에 유리한 조건이 됩니다.';
+   else desc='중간 간격 조건입니다. CaMK의 초기 pCREB 신호와 ERK/MAPK의 누적 정도가 함께 c-FOS 전사 지수를 결정합니다.';
+   $('interpret').textContent=`30분 동안 약 ${totalAP.toFixed(0)}회의 활동전위에 해당하는 설정입니다. ${desc}`;
+   $('readout').textContent=`K⁺ 통로 기능 ${Math.round(p.kv*100)}% → 모델상 AP 폭 계수 ${fmt(apWidthFactor,2)}×. CaMKIV 초기 경로 ${Math.round(final.camk*100)}%, ERK/MAPK 상태 ${Math.round(final.erk*100)}%, 합산 pCREB ${Math.round(final.pcreb*100)}% (모두 정규화 모델값). c-FOS 지수는 ${Math.round(fosIndex)}입니다. BDNF 등 다른 유전자는 별도 조절 요소가 있어 이 값과 동일하게 변한다고 볼 수 없습니다.`;
+   drawAll(); updateNeuron(final);
+ }
+ function drawChart(id,series,yMax,colors,labels){
+   const c=$(id),ctx=c.getContext('2d'),w=c.width,h=c.height,pad={l:38,r:12,t:12,b:25};ctx.clearRect(0,0,w,h);
+   ctx.strokeStyle='#293d57';ctx.lineWidth=1;ctx.fillStyle='#8299b5';ctx.font='11px system-ui';
+   for(let k=0;k<=4;k++){let y=pad.t+(h-pad.t-pad.b)*k/4;ctx.beginPath();ctx.moveTo(pad.l,y);ctx.lineTo(w-pad.r,y);ctx.stroke();ctx.fillText(fmt(yMax*(1-k/4),id==='caChart'?2:0),4,y+4);}
+   for(let k=0;k<=6;k++){let x=pad.l+(w-pad.l-pad.r)*k/6;ctx.beginPath();ctx.moveTo(x,pad.t);ctx.lineTo(x,h-pad.b);ctx.stroke();ctx.fillText(String(k*5),x-5,h-7);}
+   series.forEach((s,j)=>{ctx.beginPath();ctx.lineWidth=2.3;ctx.strokeStyle=colors[j];s.forEach((d,i)=>{let x=pad.l+(w-pad.l-pad.r)*d.t/cfg.maxTime;let y=pad.t+(h-pad.t-pad.b)*(1-clamp(d.v/yMax,0,1));i?ctx.lineTo(x,y):ctx.moveTo(x,y);});ctx.stroke();});
+   let xcur=pad.l+(w-pad.l-pad.r)*simTime/cfg.maxTime;ctx.strokeStyle='#f1f6ff';ctx.setLineDash([4,4]);ctx.beginPath();ctx.moveTo(xcur,pad.t);ctx.lineTo(xcur,h-pad.b);ctx.stroke();ctx.setLineDash([]);
+   ctx.fillStyle='#91a6c0';ctx.fillText('시간 (min)',w-67,h-7);
+ }
+ function drawAll(){if(!data.length)return;drawChart('caChart',[data.map(d=>({t:d.t,v:d.ca}))],1.5,['#59d8ed']);drawChart('pathChart',[data.map(d=>({t:d.t,v:d.camk})),data.map(d=>({t:d.t,v:d.late})),data.map(d=>({t:d.t,v:d.pcreb}))],1,['#b59aff','#ffb86b','#e8edff']);}
+ function updateNeuron(d){const active=d.ca>cfg.base+.08; $('receptorGlow').style.filter=active?'drop-shadow(0 0 9px #ffca87)':'';$('nucleus').style.filter=d.pcreb>.12?'drop-shadow(0 0 '+(6+d.pcreb*18)+'px #b59aff)':'';$('spineHead').style.transform=`scale(${1+Math.min(.22,d.pcreb*.22)})`;$('spineHead').style.transformOrigin='265px 158px';$('soma').style.filter=d.pcreb>.2?'drop-shadow(0 0 12px #57d5e8)':'';$('calciumDots').style.opacity=active?'1':'.18';$('path1').style.opacity=d.camk;$('path2').style.opacity=d.erk;$('path3').style.opacity=d.pcreb;$('path1').style.strokeDasharray='7 8';$('path2').style.strokeDasharray='7 8';$('path3').style.strokeDasharray='7 8';$('mrnaGroup').style.opacity=clamp(d.fosRate*2,0,1);$('crebBadge').style.opacity=clamp(d.pcreb*1.3,0,1);$('stateLabel').textContent=running?'신호 흐름 재생 중':(simTime>0?'계산 완료':'대기 중');}
+ function updateAtTime(){if(!data.length)return;let i=clamp(Math.round(simTime/.05),0,data.length-1);updateNeuron(data[i]);$('clock').textContent=`t = ${fmt(simTime,1)} / 30 min`;drawAll();}
+ function stop(){running=false;if(raf)cancelAnimationFrame(raf);raf=null;$('play').disabled=false;$('pause').disabled=true;$('stateLabel').textContent='일시 정지';}
+ function tick(ts){if(!running)return;if(!lastFrame)lastFrame=ts;const elapsed=(ts-lastFrame)/1000;lastFrame=ts;simTime=Math.min(30,simTime+elapsed*1.0);updateAtTime();if(simTime>=30){stop();$('stateLabel').textContent='시뮬레이션 완료';return;}raf=requestAnimationFrame(tick);}
+ function play(){if(!data.length)simulate();if(simTime>=30)simTime=0;running=true;lastFrame=0;$('play').disabled=true;$('pause').disabled=false;$('stateLabel').textContent='신호 흐름 재생 중';raf=requestAnimationFrame(tick);}
+ function preset(which){stop();if(which==='fast'){$('caPeak').value=.485;$('duration').value=1.8;$('kvFunction').value=100;$('interval').value=1;}else{$('caPeak').value=.735;$('duration').value=9;$('kvFunction').value=100;$('interval').value=5;}simTime=0;setValues();simulate();updateAtTime();}
+ controls.forEach(id=>$(id).addEventListener('input',()=>{stop();simTime=0;setValues();simulate();updateAtTime();}));
+ $('presetFast').addEventListener('click',()=>preset('fast'));$('presetSlow').addEventListener('click',()=>preset('slow'));
+ $('reset').addEventListener('click',()=>{stop();$('caPeak').value=.485;$('duration').value=1.8;$('kvFunction').value=100;$('interval').value=1;$('camkStrength').value=100;$('erkStrength').value=100;$('crebHalf').value=9.6;simTime=0;setValues();simulate();updateAtTime();});
+ $('play').addEventListener('click',play);$('pause').addEventListener('click',()=>{stop();});$('restart').addEventListener('click',()=>{stop();simTime=0;updateAtTime();});
+ setValues();simulate();updateAtTime();
+})();
+</script>
+</body>
+</html>
